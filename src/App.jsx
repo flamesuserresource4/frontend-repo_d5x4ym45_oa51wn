@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
 import Button from './Button'
 import Input from './Input'
+import LibraryPanel from './components/LibraryPanel'
 
 function useTheme() {
   const [theme, setTheme] = useState('system')
@@ -548,7 +549,7 @@ export default function App() {
             <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100">Library</h2>
             <Button variant="primary" size="sm">New</Button>
           </div>
-          <LibraryPreview />
+          <LibraryPanel />
         </section>
       )}
 

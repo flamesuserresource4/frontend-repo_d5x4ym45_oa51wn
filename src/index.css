@@ -10,11 +10,17 @@
     --font-mona: 'Mona Sans', system-ui, sans-serif;
     --font-ibm-plex: 'IBM Plex Sans', system-ui, sans-serif;
     --font-manrope: 'Manrope', system-ui, sans-serif;
+
+    /* Design tokens */
+    --primary-from: #6D28D9; /* default Aura Primary */
+    --primary-to: #2563EB;
+    --base-font: 16px; /* typography scale base */
   }
 
   html {
     font-family: var(--font-sans);
     font-feature-settings: "rlig" 1, "calt" 1;
+    font-size: var(--base-font);
   }
 
   body {
@@ -42,5 +48,19 @@
     --tw-exit-rotate: initial;
     --tw-exit-translate-x: initial;
     --tw-exit-translate-y: initial;
+  }
+
+  /* Subtle aura shimmer overlay used for skeletons */
+  .aura-shimmer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 0%, rgba(99,102,241,0.15) 20%, rgba(37,99,235,0.18) 40%, transparent 60%);
+    transform: translateX(-100%);
+    animation: auraMove 1.6s infinite;
+  }
+
+  @keyframes auraMove {
+    to { transform: translateX(100%); }
   }
 }
