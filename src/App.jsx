@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
 
 function useTheme() {
   const [theme, setTheme] = useState('system')
@@ -129,12 +129,46 @@ function UIShowcase() {
   )
 }
 
+function useBackendBase() {
+  const baseUrl = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '')
+  return baseUrl || ''
+}
+
 function LibraryPreview() {
-  const items = [
+  const base = useBackendBase()
+  const endpoint = base ? `${base}/api/recent` : `/api/recent`
+  const [items, setItems] = useState([
     { title: 'Product Launch Tweet', tag: 'Twitter', colorFrom: '#0EA5E9', colorTo: '#6366F1' },
     { title: 'Feature Update Email', tag: 'Email', colorFrom: '#6D28D9', colorTo: '#2563EB' },
     { title: 'SEO Blog Outline', tag: 'Blog', colorFrom: '#F59E0B', colorTo: '#EF4444' },
-  ]
+  ])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let mounted = true
+    async function load() {
+      try {
+        const res = await fetch(endpoint)
+        if (!res.ok) throw new Error('Failed to load')
+        const data = await res.json()
+        if (!mounted) return
+        const mapped = (data || []).map((d, i) => ({
+          title: d.prompt || 'Untitled',
+          tag: 'Recent',
+          colorFrom: ['#0EA5E9', '#6D28D9', '#F59E0B'][i % 3],
+          colorTo: ['#6366F1', '#2563EB', '#EF4444'][i % 3],
+        }))
+        if (mapped.length) setItems(mapped)
+      } catch (_) {
+        // keep defaults
+      } finally {
+        if (mounted) setLoading(false)
+      }
+    }
+    load()
+    return () => { mounted = false }
+  }, [endpoint])
+
   return (
     <div className="rounded-xl border border-slate-200/70 dark:border-slate-700/70 bg-white/70 dark:bg-slate-900/60 p-5 backdrop-blur">
       <div className="flex items-center justify-between mb-3">
@@ -142,17 +176,60 @@ function LibraryPreview() {
         <button className="text-xs px-3 py-1.5 rounded-md text-white bg-gradient-to-r from-[#6D28D9] to-[#2563EB] hover:opacity-95 transition">New</button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {items.map((it) => (
-          <div key={it.title} className="group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 p-4 transition hover:shadow">
-            <div className="absolute inset-0 opacity-[0.08]" style={{ background: `linear-gradient(135deg, ${it.colorFrom}, ${it.colorTo})` }} />
-            <p className="relative text-xs font-medium text-slate-500 dark:text-slate-400">{it.tag}</p>
-            <p className="relative mt-1 font-semibold text-slate-900 dark:text-slate-100">{it.title}</p>
-            <button className="relative mt-3 text-xs text-indigo-600 dark:text-indigo-300 group-hover:underline">Open</button>
-          </div>
-        ))}
+        {loading ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+              <div className="aura-shimmer absolute inset-0 opacity-20" />
+              <div className="h-3 w-16 bg-slate-200/70 dark:bg-slate-700/70 rounded mb-2 animate-pulse" />
+              <div className="h-4 w-2/3 bg-slate-200/70 dark:bg-slate-700/70 rounded animate-pulse" />
+            </div>
+          ))
+        ) : (
+          items.map((it) => (
+            <div key={it.title} className="group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 p-4 transition hover:shadow">
+              <div className="absolute inset-0 opacity-[0.08]" style={{ background: `linear-gradient(135deg, ${it.colorFrom}, ${it.colorTo})` }} />
+              <p className="relative text-xs font-medium text-slate-500 dark:text-slate-400">{it.tag}</p>
+              <p className="relative mt-1 font-semibold text-slate-900 dark:text-slate-100 line-clamp-2">{it.title}</p>
+              <button className="relative mt-3 text-xs text-indigo-600 dark:text-indigo-300 group-hover:underline">Open</button>
+            </div>
+          ))
+        )}
       </div>
     </div>
   )
+}
+
+function PresetChips({ onApply }) {
+  const presets = [
+    { name: 'Social', tone: 'Playful', sentiment: 'Positive', length: 'Short', prompt: 'Announce our new feature in a catchy, tweet-length update' },
+    { name: 'Email', tone: 'Professional', sentiment: 'Positive', length: 'Long', prompt: 'Write a concise product update email highlighting a 60% time saving' },
+    { name: 'Blog', tone: 'Formal', sentiment: 'Neutral', length: 'Long', prompt: 'Create an outline for a blog post about AI-assisted editing workflows' },
+  ]
+  return (
+    <div className="flex flex-wrap gap-2">
+      {presets.map((p) => (
+        <button key={p.name} onClick={() => onApply(p)} className="px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 text-xs text-slate-700 dark:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600 active:scale-[.98] transition">
+          {p.name}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function useHotkeys(ref, onSubmit) {
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const handler = (e) => {
+      const isCmd = (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'enter'
+      if (isCmd) {
+        e.preventDefault()
+        onSubmit()
+      }
+    }
+    el.addEventListener('keydown', handler)
+    return () => el.removeEventListener('keydown', handler)
+  }, [ref, onSubmit])
 }
 
 function ToneSentimentGenerator() {
@@ -168,11 +245,12 @@ function ToneSentimentGenerator() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [outputs, setOutputs] = useState([])
+  const [copiedIndex, setCopiedIndex] = useState(-1)
 
+  const areaRef = useRef(null)
   const canSubmit = prompt.trim().length > 0 && !loading
 
-  const onSubmit = async (e) => {
-    e.preventDefault()
+  const submitAction = useCallback(async () => {
     if (!canSubmit) return
     setLoading(true)
     setError('')
@@ -191,25 +269,57 @@ function ToneSentimentGenerator() {
     } finally {
       setLoading(false)
     }
+  }, [canSubmit, endpoint, prompt, tone, sentiment, length, creativity, variants])
+
+  useHotkeys(areaRef, submitAction)
+
+  const applyPreset = (p) => {
+    setTone(p.tone)
+    setSentiment(p.sentiment)
+    setLength(p.length)
+    if (p.prompt) setPrompt(p.prompt)
+  }
+
+  const copyVariant = async (text, i) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopiedIndex(i)
+      setTimeout(() => setCopiedIndex(-1), 1200)
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  const charCount = prompt.length
+
+  const onSubmit = async (e) => {
+    e.preventDefault()
+    await submitAction()
   }
 
   return (
     <div className="rounded-2xl border border-slate-200/70 dark:border-slate-700/70 bg-white/70 dark:bg-slate-900/60 p-6 backdrop-blur">
       <div className="flex items-center justify-between">
         <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">Tone & Sentiment Generator</h3>
-        <span className="text-xs text-slate-500 dark:text-slate-400">Live mock API</span>
+        <span className="text-xs text-slate-500 dark:text-slate-400">Press ⌘/Ctrl + Enter</span>
       </div>
 
       <form onSubmit={onSubmit} className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="md:col-span-2 space-y-3">
-          <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Prompt</label>
+          <div className="flex items-center justify-between">
+            <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Prompt</label>
+            <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">{charCount} chars</span>
+          </div>
           <textarea
+            ref={areaRef}
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             rows={4}
             className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-200/60 dark:focus:ring-indigo-500/20"
             placeholder="Describe what you want to generate"
           />
+
+          <PresetChips onApply={applyPreset} />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
@@ -270,8 +380,9 @@ function ToneSentimentGenerator() {
 
         {loading && (
           <div className="grid gap-3">
-            {[...Array(variants)].map((_, i) => (
-              <div key={i} className="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+            {Array.from({ length: variants }).map((_, i) => (
+              <div key={i} className="relative rounded-lg border border-slate-200 dark:border-slate-700 p-4 overflow-hidden">
+                <div className="aura-shimmer absolute inset-0 opacity-25" />
                 <div className="h-3 w-28 bg-slate-200/70 dark:bg-slate-700/70 rounded mb-2 animate-pulse" />
                 <div className="h-3 w-full bg-slate-200/70 dark:bg-slate-700/70 rounded mb-1 animate-pulse" />
                 <div className="h-3 w-5/6 bg-slate-200/70 dark:bg-slate-700/70 rounded animate-pulse" />
@@ -284,7 +395,15 @@ function ToneSentimentGenerator() {
           <div className="grid gap-3">
             {outputs.map((t, i) => (
               <div key={i} className="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-                <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">Variant {i+1}</div>
+                <div className="flex items-center justify-between mb-1">
+                  <div className="text-xs text-slate-500 dark:text-slate-400">Variant {i+1}</div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">{t.length} chars</span>
+                    <button onClick={() => copyVariant(t, i)} className="text-xs px-2 py-1 rounded-md border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-200 transition">
+                      {copiedIndex === i ? 'Copied' : 'Copy'}
+                    </button>
+                  </div>
+                </div>
                 <p className="text-slate-900 dark:text-slate-100 whitespace-pre-wrap">{t}</p>
               </div>
             ))}
