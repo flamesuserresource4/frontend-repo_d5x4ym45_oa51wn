@@ -155,6 +155,146 @@ function LibraryPreview() {
   )
 }
 
+function ToneSentimentGenerator() {
+  const baseUrl = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '')
+  const endpoint = baseUrl ? `${baseUrl}/api/generate` : `/api/generate`
+
+  const [prompt, setPrompt] = useState('Announce our AI-powered editor update that reduces drafting time by 60%')
+  const [tone, setTone] = useState('Professional')
+  const [sentiment, setSentiment] = useState('Positive')
+  const [length, setLength] = useState('Medium')
+  const [creativity, setCreativity] = useState(0.35)
+  const [variants, setVariants] = useState(2)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [outputs, setOutputs] = useState([])
+
+  const canSubmit = prompt.trim().length > 0 && !loading
+
+  const onSubmit = async (e) => {
+    e.preventDefault()
+    if (!canSubmit) return
+    setLoading(true)
+    setError('')
+    setOutputs([])
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, tone, sentiment, length, creativity, variants }),
+      })
+      if (!res.ok) throw new Error(`Request failed: ${res.status}`)
+      const data = await res.json()
+      setOutputs(data.outputs || [])
+    } catch (err) {
+      setError(err.message || 'Something went wrong')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="rounded-2xl border border-slate-200/70 dark:border-slate-700/70 bg-white/70 dark:bg-slate-900/60 p-6 backdrop-blur">
+      <div className="flex items-center justify-between">
+        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">Tone & Sentiment Generator</h3>
+        <span className="text-xs text-slate-500 dark:text-slate-400">Live mock API</span>
+      </div>
+
+      <form onSubmit={onSubmit} className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="md:col-span-2 space-y-3">
+          <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Prompt</label>
+          <textarea
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            rows={4}
+            className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-200/60 dark:focus:ring-indigo-500/20"
+            placeholder="Describe what you want to generate"
+          />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Tone</label>
+              <select value={tone} onChange={(e)=>setTone(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none">
+                <option>Professional</option>
+                <option>Playful</option>
+                <option>Formal</option>
+                <option>Casual</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Sentiment</label>
+              <select value={sentiment} onChange={(e)=>setSentiment(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none">
+                <option>Positive</option>
+                <option>Neutral</option>
+                <option>Urgent</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Length</label>
+              <select value={length} onChange={(e)=>setLength(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none">
+                <option>Short</option>
+                <option>Medium</option>
+                <option>Long</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Creativity ({creativity.toFixed(2)})</label>
+              <input type="range" min={0} max={1} step={0.05} value={creativity} onChange={(e)=>setCreativity(parseFloat(e.target.value))} className="mt-2 w-full" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Variants ({variants})</label>
+              <input type="range" min={1} max={5} step={1} value={variants} onChange={(e)=>setVariants(parseInt(e.target.value))} className="mt-2 w-full" />
+            </div>
+          </div>
+        </div>
+
+        <div className="md:col-span-1 flex flex-col gap-3">
+          <button type="submit" disabled={!canSubmit} className={`w-full px-4 py-2 rounded-lg text-white shadow transition active:scale-[.99] ${canSubmit ? 'bg-gradient-to-r from-[#6D28D9] to-[#2563EB] hover:opacity-95' : 'bg-slate-300 dark:bg-slate-700 cursor-not-allowed'}`}>
+            {loading ? 'Generating…' : 'Generate'}
+          </button>
+          <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 p-3 text-xs text-slate-600 dark:text-slate-400">
+            Adjust tone, sentiment, and length. Creativity nudges phrasing; variants returns multiple options.
+          </div>
+        </div>
+      </form>
+
+      <div className="mt-6">
+        {error && (
+          <div className="rounded-lg border border-red-300/60 bg-red-50/60 dark:border-red-800/50 dark:bg-red-900/20 text-red-700 dark:text-red-300 p-3 text-sm">
+            {error}
+          </div>
+        )}
+
+        {loading && (
+          <div className="grid gap-3">
+            {[...Array(variants)].map((_, i) => (
+              <div key={i} className="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+                <div className="h-3 w-28 bg-slate-200/70 dark:bg-slate-700/70 rounded mb-2 animate-pulse" />
+                <div className="h-3 w-full bg-slate-200/70 dark:bg-slate-700/70 rounded mb-1 animate-pulse" />
+                <div className="h-3 w-5/6 bg-slate-200/70 dark:bg-slate-700/70 rounded animate-pulse" />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {!loading && outputs.length > 0 && (
+          <div className="grid gap-3">
+            {outputs.map((t, i) => (
+              <div key={i} className="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+                <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">Variant {i+1}</div>
+                <p className="text-slate-900 dark:text-slate-100 whitespace-pre-wrap">{t}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
   const palette = useMemo(
     () => [
@@ -245,6 +385,18 @@ export default function App() {
         <div className="mt-6 space-y-6">
           <UIShowcase />
           <LibraryPreview />
+        </div>
+      </section>
+
+      {/* Tone & Sentiment Workflow */}
+      <section id="workflow" className="mx-auto max-w-7xl px-6 py-12 md:py-16">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100">Tone & Sentiment Workflow</h2>
+          <a href="#" onClick={(e)=>{e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' })}} className="text-sm text-indigo-600 dark:text-indigo-300 hover:underline">Back to top</a>
+        </div>
+        <p className="mt-1 text-slate-600 dark:text-slate-400">Live demo hitting the backend mock generation API with tone, sentiment, length, creativity, and variants.</p>
+        <div className="mt-6">
+          <ToneSentimentGenerator />
         </div>
       </section>
 
