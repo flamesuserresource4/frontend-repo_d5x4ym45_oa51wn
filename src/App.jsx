@@ -75,6 +75,8 @@ function TypeSpecimen({ label, className, children, note }) {
 }
 
 function UIShowcase() {
+  const alignedSelect = "w-full rounded-lg border bg-white dark:bg-slate-800 px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-4 transition border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-200/60 dark:focus-visible:ring-indigo-500/20";
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div className="rounded-xl border border-slate-200/70 dark:border-slate-700/70 bg-white/70 dark:bg-slate-900/60 p-5 backdrop-blur">
@@ -92,14 +94,14 @@ function UIShowcase() {
         <div className="space-y-3">
           <Input placeholder="Write a compelling Instagram caption about…" />
           <div className="flex gap-2">
-            <select className="flex-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-4 focus:ring-indigo-200/60 dark:focus:ring-indigo-500/20">
-              <option>Tone: Professional</option>
+            <select className={alignedSelect} defaultValue="Professional">
+              <option>Professional</option>
               <option>Playful</option>
               <option>Formal</option>
               <option>Casual</option>
             </select>
-            <select className="flex-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-4 focus:ring-indigo-200/60 dark:focus:ring-indigo-500/20">
-              <option>Sentiment: Positive</option>
+            <select className={alignedSelect} defaultValue="Positive">
+              <option>Positive</option>
               <option>Neutral</option>
               <option>Urgent</option>
             </select>
@@ -312,7 +314,7 @@ function ToneSentimentGenerator() {
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             rows={4}
-            className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-200/60 dark:focus:ring-indigo-500/20"
+            className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-200/60 dark:focus-visible:ring-indigo-500/20"
             placeholder="Describe what you want to generate"
           />
 
@@ -321,7 +323,7 @@ function ToneSentimentGenerator() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Tone</label>
-              <select value={tone} onChange={(e)=>setTone(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none">
+              <select value={tone} onChange={(e)=>setTone(e.target.value)} className="mt-1 w-full rounded-lg border bg-white dark:bg-slate-800 px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-4 transition border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-200/60 dark:focus-visible:ring-indigo-500/20">
                 <option>Professional</option>
                 <option>Playful</option>
                 <option>Formal</option>
@@ -330,7 +332,7 @@ function ToneSentimentGenerator() {
             </div>
             <div>
               <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Sentiment</label>
-              <select value={sentiment} onChange={(e)=>setSentiment(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none">
+              <select value={sentiment} onChange={(e)=>setSentiment(e.target.value)} className="mt-1 w-full rounded-lg border bg-white dark:bg-slate-800 px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-4 transition border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-200/60 dark:focus-visible:ring-indigo-500/20">
                 <option>Positive</option>
                 <option>Neutral</option>
                 <option>Urgent</option>
@@ -341,7 +343,7 @@ function ToneSentimentGenerator() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Length</label>
-              <select value={length} onChange={(e)=>setLength(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none">
+              <select value={length} onChange={(e)=>setLength(e.target.value)} className="mt-1 w-full rounded-lg border bg-white dark:bg-slate-800 px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none focus-visible:ring-4 transition border-slate-200 dark:border-slate-700 focus-visible:ring-indigo-200/60 dark:focus-visible:ring-indigo-500/20">
                 <option>Short</option>
                 <option>Medium</option>
                 <option>Long</option>
@@ -421,10 +423,12 @@ export default function App() {
     []
   )
 
+  const [active, setActive] = useState('create')
+
   return (
     <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#F5F3FF] via-[#EEF2FF] to-white dark:from-[#0B1020] dark:via-[#0F172A] dark:to-[#0B1020]">
       {/* Top bar */}
-      <div className="sticky top-0 z-20 backdrop-blur bg-white/60 dark:bg-slate-900/50 border-b border-slate-200/70 dark:border-slate-800">
+      <div className="sticky top-0 z-30 backdrop-blur bg-white/60 dark:bg-slate-900/50 border-b border-slate-200/70 dark:border-slate-800">
         <div className="mx-auto max-w-7xl px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="h-3 w-3 rounded-full bg-gradient-to-r from-[#6D28D9] to-[#2563EB]" />
@@ -432,89 +436,146 @@ export default function App() {
           </div>
           <DarkModeToggle />
         </div>
-      </div>
-
-      {/* Hero with Spline */}
-      <header className="relative overflow-hidden">
-        <div className="absolute inset-0 -z-10 opacity-60">
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-white/40 to-white dark:via-slate-900/40 dark:to-slate-950" />
-        </div>
-        <div className="mx-auto max-w-7xl px-6 pt-12 pb-10 md:pb-16">
-          <div className="grid items-center gap-8 md:grid-cols-2">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200/60 dark:border-indigo-800/40 bg-white/70 dark:bg-slate-900/60 px-3 py-1 text-xs text-slate-600 dark:text-slate-300 shadow-sm backdrop-blur">
-                <span className="h-2 w-2 rounded-full bg-gradient-to-r from-[#6D28D9] to-[#2563EB]" />
-                Visual Style System
-              </div>
-              <h1 className="mt-5 text-4xl md:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                Confident, minimal, future-forward
-              </h1>
-              <p className="mt-4 text-slate-600 md:text-lg dark:text-slate-300">
-                A crisp design language for fast content creation. Neutral surfaces, electric accents, and calm motion.
-              </p>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Button as="a" href="#palette" variant="primary">View Palette</Button>
-                <Button as="a" href="#components" variant="secondary">Components</Button>
-              </div>
-            </div>
-            <div className="relative aspect-square w-full">
-              <div className="absolute inset-0 rounded-3xl border border-slate-200/70 dark:border-slate-700/70 bg-white/40 dark:bg-slate-900/50 shadow-2xl backdrop-blur overflow-hidden">
-                <iframe
-                  title="Spline Aura"
-                  src="https://prod.spline.design/4cHQr84zOGAHOehh/scene.splinecode"
-                  className="h-full w-full"
-                  frameBorder="0"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Palette */}
-      <section id="palette" className="mx-auto max-w-7xl px-6 py-12 md:py-16">
-        <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100">Color Palette</h2>
-        <p className="mt-2 text-slate-600 dark:text-slate-400">Neutrals for the content canvas; luminous gradients for actions and highlights.</p>
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {palette.map((p) => (
-            <ColorSwatch key={p.name} {...p} />
+        {/* Dashboard nav */}
+        <div className="mx-auto max-w-7xl px-6 h-12 flex items-center gap-2">
+          {[
+            { id: 'create', label: 'Create' },
+            { id: 'library', label: 'Library' },
+            { id: 'settings', label: 'Settings' },
+          ].map((t) => (
+            <Button
+              key={t.id}
+              variant={active === t.id ? 'primary' : 'ghost'}
+              size="sm"
+              className={active === t.id ? '' : 'text-slate-700 dark:text-slate-300'}
+              onClick={() => setActive(t.id)}
+            >
+              {t.label}
+            </Button>
           ))}
         </div>
-      </section>
+      </div>
 
-      {/* Typography */}
-      <section className="mx-auto max-w-7xl px-6 py-12 md:py-16">
-        <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100">Typography</h2>
-        <p className="mt-2 text-slate-600 dark:text-slate-400">Inter for clarity and efficiency. Large, legible inputs and confident headings.</p>
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <TypeSpecimen label="Display / 48–60" className="text-4xl md:text-5xl font-extrabold tracking-tight">Generate content, faster</TypeSpecimen>
-          <TypeSpecimen label="Heading / 28–32" className="text-2xl md:text-3xl font-bold">Tone, sentiment, and length in one place</TypeSpecimen>
-          <TypeSpecimen label="Body / 16" className="text-base">Designed for speed with accessible contrast and predictable spacing.</TypeSpecimen>
-          <TypeSpecimen label="Mono / Meta" className="font-mono text-sm">CHAR COUNT: 142 | VARIANTS: 3</TypeSpecimen>
-        </div>
-      </section>
+      {active === 'create' && (
+        <>
+          {/* Hero with Spline */}
+          <header className="relative overflow-hidden">
+            <div className="absolute inset-0 -z-10 opacity-60">
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-white/40 to-white dark:via-slate-900/40 dark:to-slate-950" />
+            </div>
+            <div className="mx-auto max-w-7xl px-6 pt-12 pb-10 md:pb-16">
+              <div className="grid items-center gap-8 md:grid-cols-2">
+                <div>
+                  <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200/60 dark:border-indigo-800/40 bg-white/70 dark:bg-slate-900/60 px-3 py-1 text-xs text-slate-600 dark:text-slate-300 shadow-sm backdrop-blur">
+                    <span className="h-2 w-2 rounded-full bg-gradient-to-r from-[#6D28D9] to-[#2563EB]" />
+                    Visual Style System
+                  </div>
+                  <h1 className="mt-5 text-4xl md:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                    Confident, minimal, future-forward
+                  </h1>
+                  <p className="mt-4 text-slate-600 md:text-lg dark:text-slate-300">
+                    A crisp design language for fast content creation. Neutral surfaces, electric accents, and calm motion.
+                  </p>
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <Button as="a" href="#palette" variant="primary">View Palette</Button>
+                    <Button as="a" href="#components" variant="secondary">Components</Button>
+                  </div>
+                </div>
+                <div className="relative aspect-square w-full">
+                  <div className="absolute inset-0 rounded-3xl border border-slate-200/70 dark:border-slate-700/70 bg-white/40 dark:bg-slate-900/50 shadow-2xl backdrop-blur overflow-hidden">
+                    <iframe
+                      title="Spline Aura"
+                      src="https://prod.spline.design/4cHQr84zOGAHOehh/scene.splinecode"
+                      className="h-full w-full"
+                      frameBorder="0"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </header>
 
-      {/* Components */}
-      <section id="components" className="mx-auto max-w-7xl px-6 py-12 md:py-16">
-        <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100">Core Components</h2>
-        <p className="mt-2 text-slate-600 dark:text-slate-400">Reusable building blocks for the dashboard, generator, and library.</p>
-        <div className="mt-6 space-y-6">
-          <UIShowcase />
+          {/* Palette */}
+          <section id="palette" className="mx-auto max-w-7xl px-6 py-12 md:py-16">
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100">Color Palette</h2>
+            <p className="mt-2 text-slate-600 dark:text-slate-400">Neutrals for the content canvas; luminous gradients for actions and highlights.</p>
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {palette.map((p) => (
+                <ColorSwatch key={p.name} {...p} />
+              ))}
+            </div>
+          </section>
+
+          {/* Typography */}
+          <section className="mx-auto max-w-7xl px-6 py-12 md:py-16">
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100">Typography</h2>
+            <p className="mt-2 text-slate-600 dark:text-slate-400">Inter for clarity and efficiency. Large, legible inputs and confident headings.</p>
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <TypeSpecimen label="Display / 48–60" className="text-4xl md:text-5xl font-extrabold tracking-tight">Generate content, faster</TypeSpecimen>
+              <TypeSpecimen label="Heading / 28–32" className="text-2xl md:text-3xl font-bold">Tone, sentiment, and length in one place</TypeSpecimen>
+              <TypeSpecimen label="Body / 16" className="text-base">Designed for speed with accessible contrast and predictable spacing.</TypeSpecimen>
+              <TypeSpecimen label="Mono / Meta" className="font-mono text-sm">CHAR COUNT: 142 | VARIANTS: 3</TypeSpecimen>
+            </div>
+          </section>
+
+          {/* Components */}
+          <section id="components" className="mx-auto max-w-7xl px-6 py-12 md:py-16">
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100">Core Components</h2>
+            <p className="mt-2 text-slate-600 dark:text-slate-400">Reusable building blocks for the dashboard, generator, and library.</p>
+            <div className="mt-6 space-y-6">
+              <UIShowcase />
+              <LibraryPreview />
+            </div>
+          </section>
+
+          {/* Tone & Sentiment Workflow */}
+          <section id="workflow" className="mx-auto max-w-7xl px-6 py-12 md:py-16">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100">Tone & Sentiment Workflow</h2>
+              <a href="#" onClick={(e)=>{e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' })}} className="text-sm text-indigo-600 dark:text-indigo-300 hover:underline">Back to top</a>
+            </div>
+            <p className="mt-1 text-slate-600 dark:text-slate-400">Live demo hitting the backend mock generation API with tone, sentiment, length, creativity, and variants.</p>
+            <div className="mt-6">
+              <ToneSentimentGenerator />
+            </div>
+          </section>
+        </>
+      )}
+
+      {active === 'library' && (
+        <section className="mx-auto max-w-7xl px-6 py-12 md:py-16">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100">Library</h2>
+            <Button variant="primary" size="sm">New</Button>
+          </div>
           <LibraryPreview />
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* Tone & Sentiment Workflow */}
-      <section id="workflow" className="mx-auto max-w-7xl px-6 py-12 md:py-16">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100">Tone & Sentiment Workflow</h2>
-          <a href="#" onClick={(e)=>{e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' })}} className="text-sm text-indigo-600 dark:text-indigo-300 hover:underline">Back to top</a>
-        </div>
-        <p className="mt-1 text-slate-600 dark:text-slate-400">Live demo hitting the backend mock generation API with tone, sentiment, length, creativity, and variants.</p>
-        <div className="mt-6">
-          <ToneSentimentGenerator />
-        </div>
-      </section>
+      {active === 'settings' && (
+        <section className="mx-auto max-w-7xl px-6 py-12 md:py-16 space-y-8">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100">Appearance</h2>
+            <p className="mt-1 text-slate-600 dark:text-slate-400">Switch between light, dark, or system to match your environment.</p>
+            <div className="mt-4"><DarkModeToggle /></div>
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Palette</h3>
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {palette.map((p) => (
+                <ColorSwatch key={p.name} {...p} />
+              ))}
+            </div>
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Typography</h3>
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <TypeSpecimen label="Display / 48–60" className="text-4xl md:text-5xl font-extrabold tracking-tight">Generate content, faster</TypeSpecimen>
+              <TypeSpecimen label="Body / 16" className="text-base">Designed for speed with accessible contrast and predictable spacing.</TypeSpecimen>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Footer */}
       <footer className="mx-auto max-w-7xl px-6 pb-16">
