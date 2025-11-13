@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
+import Button from './Button'
+import Input from './Input'
 
 function useTheme() {
   const [theme, setTheme] = useState('system')
@@ -78,22 +80,17 @@ function UIShowcase() {
       <div className="rounded-xl border border-slate-200/70 dark:border-slate-700/70 bg-white/70 dark:bg-slate-900/60 p-5 backdrop-blur">
         <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-3">Buttons</p>
         <div className="flex flex-wrap gap-3">
-          <button className="px-4 py-2 rounded-lg text-white bg-gradient-to-r from-[#6D28D9] to-[#2563EB] shadow hover:opacity-95 active:scale-[.99] transition">
-            Primary
-          </button>
-          <button className="px-4 py-2 rounded-lg bg-white text-slate-800 border border-slate-200 hover:bg-slate-50 active:scale-[.99] transition dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700 dark:hover:bg-slate-800/80">
-            Secondary
-          </button>
-          <button className="px-4 py-2 rounded-lg bg-slate-900/90 text-white hover:bg-slate-900 active:scale-[.99] transition dark:bg-slate-700 dark:hover:bg-slate-600">
-            Dark
-          </button>
+          <Button size="md" variant="primary">Primary</Button>
+          <Button size="md" variant="secondary">Secondary</Button>
+          <Button size="md" variant="ghost">Ghost</Button>
+          <Button size="md" variant="outline">Outline</Button>
         </div>
       </div>
 
       <div className="rounded-xl border border-slate-200/70 dark:border-slate-700/70 bg-white/70 dark:bg-slate-900/60 p-5 backdrop-blur">
         <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-3">Inputs</p>
         <div className="space-y-3">
-          <input className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-200/60 dark:focus:ring-indigo-500/20" placeholder="Write a compelling Instagram caption about…" />
+          <Input placeholder="Write a compelling Instagram caption about…" />
           <div className="flex gap-2">
             <select className="flex-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-4 focus:ring-indigo-200/60 dark:focus:ring-indigo-500/20">
               <option>Tone: Professional</option>
@@ -173,7 +170,7 @@ function LibraryPreview() {
     <div className="rounded-xl border border-slate-200/70 dark:border-slate-700/70 bg-white/70 dark:bg-slate-900/60 p-5 backdrop-blur">
       <div className="flex items-center justify-between mb-3">
         <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Content Library</p>
-        <button className="text-xs px-3 py-1.5 rounded-md text-white bg-gradient-to-r from-[#6D28D9] to-[#2563EB] hover:opacity-95 transition">New</button>
+        <Button size="sm" variant="primary">New</Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {loading ? (
@@ -190,7 +187,7 @@ function LibraryPreview() {
               <div className="absolute inset-0 opacity-[0.08]" style={{ background: `linear-gradient(135deg, ${it.colorFrom}, ${it.colorTo})` }} />
               <p className="relative text-xs font-medium text-slate-500 dark:text-slate-400">{it.tag}</p>
               <p className="relative mt-1 font-semibold text-slate-900 dark:text-slate-100 line-clamp-2">{it.title}</p>
-              <button className="relative mt-3 text-xs text-indigo-600 dark:text-indigo-300 group-hover:underline">Open</button>
+              <Button as="button" size="sm" variant="ghost" className="relative mt-3">Open</Button>
             </div>
           ))
         )}
@@ -208,9 +205,9 @@ function PresetChips({ onApply }) {
   return (
     <div className="flex flex-wrap gap-2">
       {presets.map((p) => (
-        <button key={p.name} onClick={() => onApply(p)} className="px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 text-xs text-slate-700 dark:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600 active:scale-[.98] transition">
+        <Button key={p.name} size="sm" variant="secondary" onClick={() => onApply(p)}>
           {p.name}
-        </button>
+        </Button>
       ))}
     </div>
   )
@@ -362,9 +359,9 @@ function ToneSentimentGenerator() {
         </div>
 
         <div className="md:col-span-1 flex flex-col gap-3">
-          <button type="submit" disabled={!canSubmit} className={`w-full px-4 py-2 rounded-lg text-white shadow transition active:scale-[.99] ${canSubmit ? 'bg-gradient-to-r from-[#6D28D9] to-[#2563EB] hover:opacity-95' : 'bg-slate-300 dark:bg-slate-700 cursor-not-allowed'}`}>
+          <Button type="submit" size="lg" variant="primary" disabled={!canSubmit} loading={loading}>
             {loading ? 'Generating…' : 'Generate'}
-          </button>
+          </Button>
           <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 p-3 text-xs text-slate-600 dark:text-slate-400">
             Adjust tone, sentiment, and length. Creativity nudges phrasing; variants returns multiple options.
           </div>
@@ -399,9 +396,9 @@ function ToneSentimentGenerator() {
                   <div className="text-xs text-slate-500 dark:text-slate-400">Variant {i+1}</div>
                   <div className="flex items-center gap-3">
                     <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">{t.length} chars</span>
-                    <button onClick={() => copyVariant(t, i)} className="text-xs px-2 py-1 rounded-md border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-200 transition">
+                    <Button size="sm" variant="secondary" onClick={() => copyVariant(t, i)}>
                       {copiedIndex === i ? 'Copied' : 'Copy'}
-                    </button>
+                    </Button>
                   </div>
                 </div>
                 <p className="text-slate-900 dark:text-slate-100 whitespace-pre-wrap">{t}</p>
@@ -456,8 +453,8 @@ export default function App() {
                 A crisp design language for fast content creation. Neutral surfaces, electric accents, and calm motion.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <a href="#palette" className="px-5 py-2.5 rounded-lg text-white bg-gradient-to-r from-[#6D28D9] to-[#2563EB] shadow hover:opacity-95 active:scale-[.99] transition">View Palette</a>
-                <a href="#components" className="px-5 py-2.5 rounded-lg bg-white text-slate-800 border border-slate-200 hover:bg-slate-50 active:scale-[.99] transition dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700 dark:hover:bg-slate-800/80">Components</a>
+                <Button as="a" href="#palette" variant="primary">View Palette</Button>
+                <Button as="a" href="#components" variant="secondary">Components</Button>
               </div>
             </div>
             <div className="relative aspect-square w-full">
